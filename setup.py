@@ -1,19 +1,19 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='panya-music',
+    name='jmbo-music',
     version='0.0.6',
-    description='Panya music app.',
+    description='Jmbo music app.',
     long_description = open('README.rst', 'r').read(),
     author='Praekelt Foundation',
     author_email='dev@praekelt.com',
     license='BSD',
-    url='http://github.com/praekelt/panya-music',
+    url='http://github.com/praekelt/jmbo-music',
     packages = find_packages(),
     install_requires = [
         'django-ckeditor',
         'django-preferences',
-        'panya',
+        'jmbo',
         'pylast',
     ],
     include_package_data=True,

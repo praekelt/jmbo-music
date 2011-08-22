@@ -1,4 +1,4 @@
-from panya.generic.views import GenericObjectDetail
+from jmbo.generic.views import GenericObjectDetail
 from music.models import AudioEmbed
 
 class ListenLive(GenericObjectDetail):
