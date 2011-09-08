@@ -16,6 +16,10 @@ setup(
         'jmbo',
         'pylast',
     ],
+    tests_require=[
+        'django-setuptest',
+    ],
+    test_suite='setuptest.SetupTestSuite',
     include_package_data=True,
     classifiers = [
         "Programming Language :: Python",
