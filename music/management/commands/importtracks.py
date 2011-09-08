@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from music.importer import TrackImporter
 
+
 class Command(BaseCommand):
     args = '<poll_id poll_id ...>'
     help = 'Closes the specified poll for voting'
@@ -12,4 +13,3 @@ class Command(BaseCommand):
             importer.run()
         except Exception, e:
             raise CommandError(e)
- 

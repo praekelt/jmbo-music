@@ -7,22 +7,24 @@ from django.db.models.query import QuerySet
 from music.models import TrackContributor, Credit, Track
 from music.views import ListenLive
 
+
 class ListenLiveViewTestCase(unittest.TestCase):
     def test_get_queryset(self):
         queryset = ListenLive().get_queryset()
-        
+
         # should return a queryset
         self.failUnlessEqual(queryset.__class__, QuerySet)
 
+
 class TrackTestCase(unittest.TestCase):
-    
+
     def test_get_primary_contributors(self):
-        # create website site item and set as current site
+        # Create website site item and set as current site.
         web_site = Site(domain="web.address.com")
         web_site.save()
         settings.SITE_ID = web_site.id
-        
-        # create a track with some credits
+
+        # Create a track with some credits.
         track = Track(title="title")
         track.save()
         contributor1 = TrackContributor(title="title", state="published")
@@ -44,10 +46,10 @@ class TrackTestCase(unittest.TestCase):
         Credit(track=track, contributor=contributor3, role=2).save()
         Credit(track=track, contributor=unpublished_contributor, role=2).save()
         Credit(track=track, contributor=contributor4).save()
-        
-        # result should only contain contributors with highest role. 
+
+        # result should only contain contributors with highest role.
         # can contain multiples.
-        # highest role not neccessarily 1. 
+        # highest role not neccessarily 1.
         # result should not include non permitted contributors.
         # result should not include contributors with None credit role
         primary_contributors = track.get_primary_contributors()
