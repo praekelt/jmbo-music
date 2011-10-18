@@ -93,7 +93,7 @@ video is set to 422 x 344.",
         """
         primary_credits = []
         credits = self.credits.exclude(role=None).order_by('role')
-        if credits:
+        if credits.count():
             primary_role = credits[0].role
             for credit in credits:
                 if credit.role == primary_role:
@@ -104,7 +104,7 @@ video is set to 422 x 344.",
             contributor = credit.contributor
             if permitted and contributor.is_permitted:
                 contributors.append(contributor)
-            else:
+            elif not permitted:
                 contributors.append(contributor)
 
         return contributors
