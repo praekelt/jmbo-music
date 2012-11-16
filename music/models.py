@@ -1,10 +1,11 @@
+import pylast
+
 from django.db import models
 
 from ckeditor.fields import RichTextField
 from music import utils
 from jmbo.models import ModelBase
 from preferences.models import Preferences
-import pylast
 
 
 # Content models
@@ -68,11 +69,11 @@ class Track(ModelBase):
         blank=True,
         null=True,
     )
+    # todo: roll in jmbo-gallery youtube video code?
     video_embed = models.TextField(
         blank=True,
         null=True,
-        help_text="A video embed script related to the track. Ensure the \
-video is set to 422 x 344.",
+        help_text="A video embed script related to the track.",
     )
     last_played = models.DateTimeField(
         blank=True,
@@ -84,6 +85,7 @@ video is set to 422 x 344.",
         help_text="Length of track in seconds."
     )
 
+    # xxx: investigate permitted use. Is it necessary? Seems so for multilingual site.
     def get_primary_contributors(self, permitted=True):
         """
         Returns a list of primary contributors, with primary being
