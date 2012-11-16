@@ -69,7 +69,11 @@ class Track(ModelBase):
         blank=True,
         null=True,
     )
-    # todo: roll in jmbo-gallery youtube video code?
+    audio_embed = models.TextField(
+        blank=True,
+        null=True,
+        help_text="An audio embed script related to the track.",
+    )
     video_embed = models.TextField(
         blank=True,
         null=True,
