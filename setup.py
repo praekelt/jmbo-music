@@ -11,7 +11,7 @@ setup(
     url='http://github.com/praekelt/jmbo-music',
     packages = find_packages(),
     install_requires = [
-        'jmbo-foundry>=0.7',
+        'jmbo-gallery>=0.2',
         'pylast',
     ],
     tests_require=[

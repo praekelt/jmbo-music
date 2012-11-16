@@ -1,3 +1,4 @@
+import re
 import pylast
 
 from django.db import models
@@ -77,7 +78,7 @@ class Track(ModelBase):
     video_embed = models.TextField(
         blank=True,
         null=True,
-        help_text="A video embed script related to the track.",
+        help_text="Embedding markup as supplied by Youtube.",
     )
     last_played = models.DateTimeField(
         blank=True,
@@ -125,6 +126,21 @@ class Track(ModelBase):
             role=role
         )
         return credit, contributor
+
+    @property
+    def youtube_id(self):
+        """Extract and return Youtube video id"""
+        if not self.video_embed:
+            return ''
+        m = re.search(r'/embed/([A-Za-z0-9\-=_]*)', self.video_embed)
+        if m:
+            return m.group(1)
+        return ''
+
+    @property
+    def embed(self):
+        """Compatibility with jmbo-gallery template tag"""
+        return self.video_embed
 
 
 # Options models
