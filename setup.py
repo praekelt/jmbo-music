@@ -11,14 +11,13 @@ setup(
     url='http://github.com/praekelt/jmbo-music',
     packages = find_packages(),
     install_requires = [
-        'django-ckeditor',
-        'jmbo',
+        'jmbo-gallery>=0.2',
         'pylast',
     ],
     tests_require=[
-        'django-setuptest',
+        'django-setuptest>=0.1.2',
     ],
-    test_suite='setuptest.SetupTestSuite',
+    test_suite='setuptest.setuptest.SetupTestSuite',
     include_package_data=True,
     classifiers = [
         "Programming Language :: Python",
