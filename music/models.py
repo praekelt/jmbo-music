@@ -90,13 +90,12 @@ class Track(ModelBase):
         help_text="Length of track in seconds."
     )
 
-    # xxx: investigate permitted use. Is it necessary? Seems so for multilingual site.
-    def get_primary_contributors(self, permitted=True):
-        """
-        Returns a list of primary contributors, with primary being
+    # todo: investigate speed with large datasets
+    @property
+    def primary_contributors_permitted(self, permitted=True):
+        """Returns a list of primary contributors, with primary being
         defined as those contributors that have the highest role
-        assigned(in terms of priority). When permitted is set to
-        True only permitted contributors are returned.
+        assigned(in terms of priority).
         """
         primary_credits = []
         credits = self.credits.exclude(role=None).order_by('role')
@@ -109,9 +108,7 @@ class Track(ModelBase):
         contributors = []
         for credit in primary_credits:
             contributor = credit.contributor
-            if permitted and contributor.is_permitted:
-                contributors.append(contributor)
-            elif not permitted:
+            if contributor.is_permitted:
                 contributors.append(contributor)
 
         return contributors
