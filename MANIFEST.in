@@ -2,6 +2,5 @@ include AUTHORS.rst
 include LICENSE
 include README.rst
 include CHANGELOG.rst
-recursive-include music/fixtures *
 recursive-include music/templates *
-recursive-include music/management *
+recursive-include music/migrations *
