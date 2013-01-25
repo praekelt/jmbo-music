@@ -1,8 +1,8 @@
 Changelog
 =========
 
-next
-----
+0.1.2
+-----
 #. Friendlier urls to detail pages.
 
 0.1.1
