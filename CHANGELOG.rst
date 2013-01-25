@@ -1,6 +1,10 @@
 Changelog
 =========
 
+next
+----
+#. Friendlier urls to detail pages.
+
 0.1.1
 -----
 #. Rename `get_primary_contributers` method to be `primary_contributors_permitted` property to adhere to Jmbo convention.
