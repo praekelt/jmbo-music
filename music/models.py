@@ -31,10 +31,10 @@ class Credit(models.Model):
         'music.Track',
         related_name='credits',
     )
-    role = models.IntegerField(
-        blank=True,
-        null=True,
-    )
+    credit_option = models.ForeignKey('music.CreditOption')
+
+    def __unicode__(self):
+        return self.contributor.title
 
 
 class TrackContributor(ModelBase):
@@ -113,14 +113,31 @@ class Track(ModelBase):
 
         return contributors
 
-    def create_credit(self, contributor_title, role):
+    def create_credit(self, contributor_title, role_type):
         contributor, created = TrackContributor.objects.get_or_create(
             title=contributor_title
         )
+        if created:
+            # Copy some fields to contributor
+            contributor.sites = self.sites.all()
+            contributor.state = self.state
+            contributor.owner = self.owner
+            contributor.save()
+
+        # Use first matching credit option if it exists. If it does not exist 
+        # then create it with available data.
+        credit_options = CreditOption.objects.filter(role_type=role_type)
+        if credit_options:
+            credit_option = credit_options[0]
+        else:
+            credit_option = CreditOption.objects.create(
+                role_type=role_type, role_name=role_type
+            )
+
         credit, created = Credit.objects.get_or_create(
             contributor=contributor,
             track=self,
-            role=role
+            credit_option=credit_option
         )
         return credit, contributor
 
@@ -149,14 +166,27 @@ class MusicPreferences(Preferences):
         verbose_name_plural = "Music preferences"
 
 
-class MusicCreditOption(models.Model):
+class CreditOption(models.Model):
     music_preferences = models.ForeignKey('preferences.MusicPreferences')
+    role_type = models.CharField(
+        max_length=16,
+        default='artist',
+        choices=(('artist', 'artist'), ('composer', 'composer'), ('other', 'other')),
+        help_text="""An identifier used to do internal queries. Pick one that \
+closest resembles the credit option."""
+    )
     role_name = models.CharField(
         max_length=256,
         blank=True,
         null=True,
+        help_text="""A friendly name for the credit option."""
     )
     role_priority = models.IntegerField(
         blank=True,
         null=True,
+        help_text="""An artist is typically more important than the producer. \
+Set role priorities accordingly."""
     )
+
+    def __unicode__(self):
+        return self.role_name
