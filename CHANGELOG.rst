@@ -5,6 +5,7 @@ next
 ----
 #. Refactor credit options to work in a multilingual environment. Existing credit options will be lost but at worst existing UI will have a blank space. 
 #. Track feed management command framework created. Includes a demo track feed `track_feed_example`.
+#. Pull artist, track and album info from Wikipedia.
 
 0.1.2
 -----
