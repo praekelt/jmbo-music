@@ -1,6 +1,9 @@
+import os
 import re
 
 from django.db import models
+from django.core.files import File
+from django.conf import settings
 
 from ckeditor.fields import RichTextField
 from preferences.models import Preferences
@@ -119,6 +122,17 @@ class Track(ModelBase):
             contributors = self.get_primary_contributors()
             if contributors:
                 self.image = contributors[0].image
+                self.save()
+
+        # if still not image then default
+        if not self.image:
+            filename = settings.STATIC_ROOT + 'music/images/default.png'
+            if os.path.exists(filename):
+                image = File(
+                    open(filename, 'rb')
+                )
+                image.name = 'default.png'
+                self.image = image
                 self.save()
 
     # todo: investigate speed with large datasets
