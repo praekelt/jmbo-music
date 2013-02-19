@@ -1,12 +1,16 @@
+import os
 import re
-import pylast
 
 from django.db import models
+from django.core.files import File
+from django.conf import settings
 
 from ckeditor.fields import RichTextField
-from music import utils
-from jmbo.models import ModelBase
 from preferences.models import Preferences
+from jmbo.models import ModelBase
+
+
+from music.utils import set_image_via_wikipedia
 
 
 # Content models
@@ -19,7 +23,20 @@ class AudioEmbed(ModelBase):
 
 
 class Album(ModelBase):
-    pass
+    
+    def save(self, *args, **kwargs):
+        set_image = kwargs.pop('set_image', True)
+        super(Album, self).save(*args, **kwargs)
+        if set_image:
+            self.set_image()
+
+    def set_image(self):
+        """This code must be in its own method since the fetch functions need
+        credits to be set. m2m fields are not yet set at the end of either the
+        save method or post_save signal."""
+
+        if not self.image:
+            set_image_via_wikipedia(self)
 
 
 class Credit(models.Model):
@@ -31,10 +48,10 @@ class Credit(models.Model):
         'music.Track',
         related_name='credits',
     )
-    role = models.IntegerField(
-        blank=True,
-        null=True,
-    )
+    credit_option = models.ForeignKey('music.CreditOption')
+
+    def __unicode__(self):
+        return self.contributor.title
 
 
 class TrackContributor(ModelBase):
@@ -50,13 +67,9 @@ class TrackContributor(ModelBase):
     )
 
     def save(self, *args, **kwargs):
-        if not self.image:
-            self.image = utils.set_image_via_lastfm(
-                self.title,
-                self._meta.get_field_by_name('image')
-            )
-
         super(TrackContributor, self).save(*args, **kwargs)
+        if not self.image:
+            set_image_via_wikipedia(self)
 
 
 class Track(ModelBase):
@@ -90,37 +103,93 @@ class Track(ModelBase):
         help_text="Length of track in seconds."
     )
 
+    def save(self, *args, **kwargs):
+        set_image = kwargs.pop('set_image', True)
+        super(Track, self).save(*args, **kwargs)
+        if set_image:
+            self.set_image()
+
+    def set_image(self):        
+        """This code must be in its own method since the fetch functions need
+        credits to be set. m2m fields are not yet set at the end of either the
+        save method or post_save signal."""
+
+        if not self.image:
+            set_image_via_wikipedia(self)
+
+        # If still no image then use first contributor image
+        if not self.image:
+            contributors = self.get_primary_contributors()
+            if contributors:
+                self.image = contributors[0].image
+                self.save()
+
+        # if still not image then default
+        if not self.image:
+            filename = settings.STATIC_ROOT + 'music/images/default.png'
+            if os.path.exists(filename):
+                image = File(
+                    open(filename, 'rb')
+                )
+                image.name = 'default.png'
+                self.image = image
+                self.save()
+
     # todo: investigate speed with large datasets
-    @property
-    def primary_contributors_permitted(self, permitted=True):
+    def get_primary_contributors(self, permitted=False):
         """Returns a list of primary contributors, with primary being
         defined as those contributors that have the highest role
         assigned(in terms of priority).
         """
+        #import pdb;pdb.set_trace()
         primary_credits = []
-        credits = self.credits.exclude(role=None).order_by('role')
-        if credits.count():
-            primary_role = credits[0].role
+        credits = self.credits.exclude(
+            credit_option__role_priority=None
+        ).order_by('credit_option__role_priority')
+        if credits.exists():
+            primary_priority = credits[0].credit_option.role_priority
             for credit in credits:
-                if credit.role == primary_role:
+                if credit.credit_option.role_priority == primary_priority:
                     primary_credits.append(credit)
 
         contributors = []
         for credit in primary_credits:
             contributor = credit.contributor
-            if contributor.is_permitted:
+            if (permitted == False) or \
+                ((permitted == True) and contributor.is_permitted):
                 contributors.append(contributor)
 
         return contributors
 
-    def create_credit(self, contributor_title, role):
+    @property
+    def primary_contributors_permitted(self):
+        return self.get_primary_contributors(permitted=True)       
+
+    def create_credit(self, contributor_title, role_type):
         contributor, created = TrackContributor.objects.get_or_create(
             title=contributor_title
         )
+        if created:
+            # Copy some fields to contributor
+            contributor.sites = self.sites.all()
+            contributor.state = self.state
+            contributor.owner = self.owner
+            contributor.save()
+
+        # Use first matching credit option if it exists. If it does not exist 
+        # then create it with available data.
+        credit_options = CreditOption.objects.filter(role_type=role_type)
+        if credit_options:
+            credit_option = credit_options[0]
+        else:
+            credit_option = CreditOption.objects.create(
+                role_type=role_type, role_name=role_type
+            )
+
         credit, created = Credit.objects.get_or_create(
             contributor=contributor,
             track=self,
-            role=role
+            credit_option=credit_option
         )
         return credit, contributor
 
@@ -149,14 +218,27 @@ class MusicPreferences(Preferences):
         verbose_name_plural = "Music preferences"
 
 
-class MusicCreditOption(models.Model):
+class CreditOption(models.Model):
     music_preferences = models.ForeignKey('preferences.MusicPreferences')
+    role_type = models.CharField(
+        max_length=16,
+        default='artist',
+        choices=(('artist', 'artist'), ('composer', 'composer'), ('other', 'other')),
+        help_text="""An identifier used to do internal queries. Pick one that \
+closest resembles the credit option."""
+    )
     role_name = models.CharField(
         max_length=256,
         blank=True,
         null=True,
+        help_text="""A friendly name for the credit option."""
     )
     role_priority = models.IntegerField(
         blank=True,
         null=True,
+        help_text="""An artist is typically more important than the producer. \
+Set role priorities accordingly."""
     )
+
+    def __unicode__(self):
+        return self.role_name
