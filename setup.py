@@ -12,6 +12,7 @@ setup(
     packages = find_packages(),
     install_requires = [
         'jmbo-gallery>=0.2',
+        'lxml',
         'pylast',
     ],
     tests_require=[
