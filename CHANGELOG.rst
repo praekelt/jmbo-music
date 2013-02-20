@@ -1,6 +1,10 @@
 Changelog
 =========
 
+next
+----
+#. Compromise on a foreign key being null so South migration works on legacy database.
+
 0.2
 ---
 #. Refactor credit options to work in a multilingual environment. Existing credit options will be lost but at worst existing UI will have a blank space. 
