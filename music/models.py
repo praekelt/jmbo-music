@@ -141,7 +141,6 @@ class Track(ModelBase):
         defined as those contributors that have the highest role
         assigned(in terms of priority).
         """
-        #import pdb;pdb.set_trace()
         primary_credits = []
         credits = self.credits.exclude(
             credit_option=None, credit_option__role_priority=None
