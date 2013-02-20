@@ -48,7 +48,7 @@ class Credit(models.Model):
         'music.Track',
         related_name='credits',
     )
-    credit_option = models.ForeignKey('music.CreditOption')
+    credit_option = models.ForeignKey('music.CreditOption', null=True)
 
     def __unicode__(self):
         return self.contributor.title
@@ -144,7 +144,7 @@ class Track(ModelBase):
         #import pdb;pdb.set_trace()
         primary_credits = []
         credits = self.credits.exclude(
-            credit_option__role_priority=None
+            credit_option=None, credit_option__role_priority=None
         ).order_by('credit_option__role_priority')
         if credits.exists():
             primary_priority = credits[0].credit_option.role_priority
