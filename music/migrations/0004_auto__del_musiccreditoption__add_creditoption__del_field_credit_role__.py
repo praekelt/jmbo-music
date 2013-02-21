@@ -26,7 +26,7 @@ class Migration(SchemaMigration):
 
         # Adding field 'Credit.credit_option'
         db.add_column('music_credit', 'credit_option',
-                      self.gf('django.db.models.fields.related.ForeignKey')(default=None, to=orm['music.CreditOption']),
+                      self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['music.CreditOption']),
                       keep_default=False)
 
 
