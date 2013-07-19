@@ -23,7 +23,7 @@ class AudioEmbed(ModelBase):
 
 
 class Album(ModelBase):
-    
+
     def save(self, *args, **kwargs):
         set_image = kwargs.pop('set_image', True)
         super(Album, self).save(*args, **kwargs)
@@ -96,6 +96,7 @@ class Track(ModelBase):
     last_played = models.DateTimeField(
         blank=True,
         null=True,
+        db_index=True,
     )
     length = models.IntegerField(
         blank=True,
@@ -109,7 +110,7 @@ class Track(ModelBase):
         if set_image:
             self.set_image()
 
-    def set_image(self):        
+    def set_image(self):
         """This code must be in its own method since the fetch functions need
         credits to be set. m2m fields are not yet set at the end of either the
         save method or post_save signal."""
@@ -162,7 +163,7 @@ class Track(ModelBase):
 
     @property
     def primary_contributors_permitted(self):
-        return self.get_primary_contributors(permitted=True)       
+        return self.get_primary_contributors(permitted=True)
 
     def create_credit(self, contributor_title, role_type):
         contributor, created = TrackContributor.objects.get_or_create(
@@ -175,7 +176,7 @@ class Track(ModelBase):
             contributor.owner = self.owner
             contributor.save()
 
-        # Use first matching credit option if it exists. If it does not exist 
+        # Use first matching credit option if it exists. If it does not exist
         # then create it with available data.
         credit_options = CreditOption.objects.filter(role_type=role_type)
         if credit_options:
