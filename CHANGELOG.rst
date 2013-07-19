@@ -1,6 +1,10 @@
 Changelog
 =========
 
+0.2.2
+-----
+#. Add index on `last_played` field.
+
 0.2.1
 -----
 #. Compromise on a foreign key being null so South migration works on legacy database.
