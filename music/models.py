@@ -104,6 +104,13 @@ class Track(ModelBase):
         help_text="Length of track in seconds."
     )
 
+    def __unicode__(self):
+        contributors = self.get_primary_contributors()
+        if contributors:
+            return '%s - %s' % (self.title, contributors[0].title)
+        else:
+            return self.title
+
     def save(self, *args, **kwargs):
         set_image = kwargs.pop('set_image', True)
         super(Track, self).save(*args, **kwargs)

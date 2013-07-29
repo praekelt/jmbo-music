@@ -1,6 +1,10 @@
 Changelog
 =========
 
+next
+----
+#. `__unicode__` for track now includes primary contributor.
+
 0.2.2
 -----
 #. Add index on `last_played` field.
