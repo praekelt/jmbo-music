@@ -10,13 +10,12 @@ import urllib2
 from lxml import etree
 import pylast
 
-from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.files import File
+from django.conf import settings
 
 
-def _set_image_via_wikipedia(instance):
-    #print "PROCESSING %s" % instance.title
+def _wikipedia(instance):
 
     # Prevent a circular import by importing here
     from music.models import TrackContributor, Track, Album
@@ -25,17 +24,17 @@ def _set_image_via_wikipedia(instance):
     if isinstance(instance, TrackContributor):
         search = instance.title + ' artist'
     elif isinstance(instance, Track):
-        search = ''
+        # Track pages usually don't exist on Wikipedia so preferably use artist
         contributors = instance.get_primary_contributors()
         if contributors:
-            search = contributors[0].title + ' '
-        search = search + instance.title + ' song'
+            search = contributors[0].title + ' artist'
+        else:
+            # Maybe we get lucky with just the song title
+            search = instance.title + ' song'
     elif isinstance(instance, Album):
         search = instance.title + ' album'
     else:
         return
-
-    #print "SEARCH FOR %s" % search
 
     # Common settings
     url = 'http://en.wikipedia.org/w/api.php'
@@ -100,49 +99,86 @@ def _set_image_via_wikipedia(instance):
                 instance.image.save(filename, File(open(tempfile[0])))
 
 
-def set_image_via_wikipedia(instance):
+def wikipedia(instance):
     # Many things can go wrong. Catch and log.
     try:
-        _set_image_via_wikipedia(instance)
+        _wikipedia(instance)
     except Exception, e:
-        logging.warn("set_image_via_wikipedia - title %s exception %s" \
+        logging.warn("_wikipedia - title %s exception %s" \
             % (instance.title, e))
 
 
-def _set_image_via_lastfm(instance):
-    """xxx: lastfm may currently be broken"""    
-    INVALID_IMAGE_MD5 = ['28fa757eff47ecfb498512f71dd64f5f']
+def _lastfm(instance):
 
-    # Only artist lookup currently supported
-    if not isinstance(instance, TrackContributor):
+    di = getattr(settings, 'JMBO_MUSIC', {})
+    try:
+        api_key = settings.JMBO_MUSIC['lastfm_api_key']
+        api_secret = settings.JMBO_MUSIC['lastfm_api_secret']
+    except AttributeError:
+        raise RuntimeError("Settings is not configured properly")
+
+    network = pylast.LastFMNetwork(api_key=api_key, api_secret=api_secret)
+
+    # Prevent a circular import by importing here
+    from music.models import TrackContributor, Track, Album
+
+    if isinstance(instance, TrackContributor):
+        try:
+            obj = network.get_artist(instance.title)
+        except pylast.WSError:
+            return
+    elif isinstance(instance, Track):
+        # Tracks don't have images on Last.fm so use artist
+        contributors = instance.get_primary_contributors()
+        if contributors:
+            try:
+                obj = network.get_artist(contributors[0].title)
+            except pylast.WSError:
+                return
+        else:
+            return
+    elif isinstance(instance, Album):
+        # We need the primary contributor but can't jump with 100% certainty to
+        # the track, so make a best effort.
+        tracks = instance.track_set.all()
+        contributors = None
+        if tracks:
+            contributors = tracks[0].get_primary_contributors()
+        if contributors:
+            artist = contributors[0].title
+        else:
+            artist = None
+        try:
+            obj = network.get_album(artist, instance.title)
+        except pylast.WSError:
+            return
+    else:
         return
 
     try:
-        network = pylast.LastFMNetwork(
-            api_key=settings.LASTFM_API_KEY,
-            api_secret=settings.LASTFM_API_SECRET
-        )
-        artist = network.get_artist(instance.title)
-        image_url = artist.get_cover_image()
-        url = artist.get_cover_image()
-        if url:
-            file_name = '.'.join([instance.title, url.split('.')[-1]]).\
-                    replace('/', '-')
-            data = urlopen(url).read()
-            if hashlib.md5(data).hexdigest() not in INVALID_IMAGE_MD5:
-                relative_path = instance.image.upload_to('', file_name)
-                f = open(os.path.join(settings.MEDIA_ROOT, relative_path), 'w')
-                f.write(data)
-                f.close()
-    except Exception, e:
-        logging.warn("Unable to set image for %s: %s" % (instance.title, e))
+        url = obj.get_cover_image()
+    except pylast.WSError:
+        return
+
+    if url:
+        filename = url.split('/')[-1]
+        tempfile = urlretrieve(url)
+        instance.image.save(filename, File(open(tempfile[0])))
 
 
-def set_image_via_lastfm(instance):
+def lastfm(instance):
     # Many things can go wrong. Catch and log.
     try:
-        _set_image_via_lastfm(instance)
+        _lastfm(instance)
     except Exception, e:
-        logging.warn("set_image_via_lastfm - title %s exception %s" \
+        logging.warn("_lastfm - title %s exception %s" \
             % (instance.title, e))
 
+
+def scrape_image(instance):
+    di = getattr(settings, 'JMBO_MUSIC', {})
+    scrapers = di.get('scrapers', ('lastfm', 'wikipedia'))
+    for scraper in scrapers:
+        globals()[scraper](instance)
+        if instance.image:
+            break
