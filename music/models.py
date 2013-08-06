@@ -10,7 +10,7 @@ from preferences.models import Preferences
 from jmbo.models import ModelBase
 
 
-from music.utils import set_image_via_wikipedia
+from music.utils import scrape_image
 
 
 # Content models
@@ -36,7 +36,7 @@ class Album(ModelBase):
         save method or post_save signal."""
 
         if not self.image:
-            set_image_via_wikipedia(self)
+            scrape_image(self)
 
 
 class Credit(models.Model):
@@ -69,7 +69,7 @@ class TrackContributor(ModelBase):
     def save(self, *args, **kwargs):
         super(TrackContributor, self).save(*args, **kwargs)
         if not self.image:
-            set_image_via_wikipedia(self)
+            scrape_image(self)
 
 
 class Track(ModelBase):
@@ -123,7 +123,7 @@ class Track(ModelBase):
         save method or post_save signal."""
 
         if not self.image:
-            set_image_via_wikipedia(self)
+            scrape_image(self)
 
         # If still no image then use first contributor image
         if not self.image:

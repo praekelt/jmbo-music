@@ -1,6 +1,10 @@
 Changelog
 =========
 
+0.2.4
+-----
+#. Reinstate last.fm scraping. Scrapers can now be chained.
+
 0.2.3
 -----
 #. `__unicode__` for track now includes primary contributor.

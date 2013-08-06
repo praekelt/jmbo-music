@@ -1,16 +1,18 @@
-DATABASE_ENGINE = 'sqlite3'
+from foundry.settings import *
 
-INSTALLED_APPS = [
-    'django.contrib.contenttypes',
-    'django.contrib.sites',
-    'category',
-    'jmbo',
-    'music',
-    'photologue',
-    'publisher',
-    'secretballot',
-]
 
-CKEDITOR_MEDIA_PREFIX = '/media/ckeditor'
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.contrib.gis.db.backends.spatialite',
+        'NAME': 'test_music.db',
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': '',
+        'PORT': '',
+    }
+}
 
-SITE_ID = 1
+JMBO_MUSIC = {
+    'lastfm_api_key': 'c91d15b736995c4dac4e8b2b8cdbdb98 ',
+    'lastfm_api_secret': '',
+}
