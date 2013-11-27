@@ -1,6 +1,10 @@
 Changelog
 =========
 
+next
+----
+#. Clean up tests.
+
 0.2.4
 -----
 #. Reinstate last.fm scraping. Scrapers can now be chained.
