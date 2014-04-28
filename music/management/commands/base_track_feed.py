@@ -16,11 +16,13 @@ def _do_create(di):
     artists = di['artist']
     if isinstance(artists, StringType):
         artists = [artists]
+
     # todo: handle case where different artists have a song with the same title
-    try:
-        track = Track.objects.get(title=track, state='published')
+    tracks = Track.objects.filter(title=track, state='published')
+    if tracks:
+        track = tracks[0]
         track_created = False
-    except Track.DoesNotExist:
+    else:
         track = Track.objects.create(title=track, state='published')
         track_created = True
 
