@@ -4,6 +4,7 @@ Changelog
 next
 ----
 #. Clean up tests.
+#. Defensive code to handle tracks wih the same title in scraper.
 
 0.2.4
 -----
@@ -23,7 +24,7 @@ next
 
 0.2
 ---
-#. Refactor credit options to work in a multilingual environment. Existing credit options will be lost but at worst existing UI will have a blank space. 
+#. Refactor credit options to work in a multilingual environment. Existing credit options will be lost but at worst existing UI will have a blank space.
 #. Track feed management command framework created. Includes a demo track feed `track_feed_example`.
 #. Pull artist, track and album info from Wikipedia.
 
