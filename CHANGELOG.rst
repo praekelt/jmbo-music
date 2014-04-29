@@ -1,8 +1,8 @@
 Changelog
 =========
 
-next
-----
+0.2.5
+-----
 #. Clean up tests.
 #. Defensive code to handle tracks wih the same title in scraper.
 
