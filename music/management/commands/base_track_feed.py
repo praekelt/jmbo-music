@@ -12,13 +12,19 @@ from music.models import Track
 
 def _do_create(di):
     """Function that interprets a dictionary and creates objects"""
-    track = di['track'].strip()            
+    track = di['track'].strip()
     artists = di['artist']
     if isinstance(artists, StringType):
         artists = [artists]
-    track, track_created = Track.objects.get_or_create(
-        title=track, state='published',
-    )
+
+    # todo: handle case where different artists have a song with the same title
+    tracks = Track.objects.filter(title=track, state='published')
+    if tracks:
+        track = tracks[0]
+        track_created = False
+    else:
+        track = Track.objects.create(title=track, state='published')
+        track_created = True
 
     last_played = di.get('last_played', None)
     if last_played and (track.last_played != last_played):
@@ -37,14 +43,14 @@ def _do_create(di):
 
 class BaseCommand(ManagementBaseCommand):
 
-    help = """Process a track feed and create or update tracks. Do not call 
+    help = """Process a track feed and create or update tracks. Do not call
 this command directly. It is intended to be subclassed."""
 
     @transaction.commit_on_success
     def handle(self, *args, **options):
         for di in self.past_tracks:
             _do_create(di)
-  
+
         di = self.current_track
         if di:
             if not di.has_key('last_played'):
