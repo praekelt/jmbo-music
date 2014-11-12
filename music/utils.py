@@ -114,7 +114,7 @@ def _lastfm(instance):
     try:
         api_key = settings.JMBO_MUSIC['lastfm_api_key']
         api_secret = settings.JMBO_MUSIC['lastfm_api_secret']
-    except AttributeError:
+    except (AttributeError, KeyError):
         raise RuntimeError("Settings is not configured properly")
 
     network = pylast.LastFMNetwork(api_key=api_key, api_secret=api_secret)

@@ -31,7 +31,7 @@ class ScraperTestCase(TestCase):
         track = Track.objects.create(title="Don't look back in anger")
         track.create_credit("Oasis", "artist")
         track.album.add(album.id)
-        #track.save()
+        track.save()
         cls.wikipedia_artist = artist
         cls.wikipedia_album = album
         cls.wikipedia_track = track
@@ -41,7 +41,7 @@ class ScraperTestCase(TestCase):
         track = Track.objects.create(title="All My Life")
         track.create_credit("Foo Fighters", "artist")
         track.album.add(album.id)
-        #track.save()
+        track.save()
         cls.lastfm_artist = artist
         cls.lastfm_album = album
         cls.lastfm_track = track
@@ -73,6 +73,12 @@ class ScraperTestCase(TestCase):
         # Track is exempt because it always gets a default image
 
     def test_lastfm(self):
+        # Abort test if no API key was set
+        try:
+            dc = settings.JMBO_MUSIC['lastfm_api_key']
+            dc = settings.JMBO_MUSIC['lastfm_api_secret']
+        except KeyError:
+            return
         settings.JMBO_MUSIC['scrapers'] = ['lastfm']
         lastfm(self.lastfm_artist)
         lastfm(self.lastfm_album)

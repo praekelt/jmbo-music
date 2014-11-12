@@ -130,9 +130,9 @@ class Track(ModelBase):
             contributors = self.get_primary_contributors()
             if contributors:
                 self.image = contributors[0].image
-                self.save()
+                self.save(set_image=False)
 
-        # if still not image then default
+        # If still not image then default
         if not self.image:
             filename = settings.STATIC_ROOT + 'music/images/default.png'
             if os.path.exists(filename):
@@ -141,7 +141,7 @@ class Track(ModelBase):
                 )
                 image.name = 'default.png'
                 self.image = image
-                self.save()
+                self.save(set_image=False)
 
     # todo: investigate speed with large datasets
     def get_primary_contributors(self, permitted=False):
