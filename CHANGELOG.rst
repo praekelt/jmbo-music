@@ -1,6 +1,10 @@
 Changelog
 =========
 
+next
+----
+#. Fix tests.
+
 0.2.6
 -----
 #. Add South dependency on jmbo.
