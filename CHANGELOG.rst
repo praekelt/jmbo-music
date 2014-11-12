@@ -1,9 +1,10 @@
 Changelog
 =========
 
-next
-----
+0.2.7
+-----
 #. Fix tests.
+#. Fix possible recursion error when saving a track.
 
 0.2.6
 -----
