@@ -1,6 +1,10 @@
 Changelog
 =========
 
+0.2.9
+-----
+#. Expand the API.
+
 0.2.8
 -----
 #. Implement an API.
