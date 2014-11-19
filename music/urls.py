@@ -1,6 +1,12 @@
 from django.conf import settings
 from django.conf.urls.defaults import patterns, url
 
+from jmbo.urls import v1_api
+
+from music.api import TrackResource
+
+
+v1_api.register(TrackResource())
 
 urlpatterns = patterns(
     '',
