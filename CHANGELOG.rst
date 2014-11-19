@@ -1,6 +1,10 @@
 Changelog
 =========
 
+0.2.8
+-----
+#. Implement an API.
+
 0.2.7
 -----
 #. Fix tests.
