@@ -11,6 +11,7 @@ class TrackResource(ModelBaseResource):
     class Meta:
         queryset = Track.permitted.all()
         resource_name = 'track'
+        ordering = ['last_played']
 
     def override_urls(self):
         return [
