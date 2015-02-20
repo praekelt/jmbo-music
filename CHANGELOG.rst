@@ -1,6 +1,10 @@
 Changelog
 =========
 
+0.2.10
+------
+#. Expand API to include Track Contributor.
+
 0.2.9
 -----
 #. Expand the API.
