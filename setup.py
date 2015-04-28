@@ -11,13 +11,14 @@ setup(
     url='http://github.com/praekelt/jmbo-music',
     packages = find_packages(),
     install_requires = [
-        'jmbo>=1.1.1',
-        'jmbo-gallery>=0.2',
+        'jmbo==2.0.0a2',
+        'jmbo-gallery==2.0.0a1',
         'lxml',
         'pylast',
     ],
     tests_require=[
-        'django-setuptest>=0.1.4',
+        'django-setuptest>=0.1.6',
+        'psycopg2',
     ],
     test_suite='setuptest.setuptest.SetupTestSuite',
     include_package_data=True,

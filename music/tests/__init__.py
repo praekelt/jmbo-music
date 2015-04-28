@@ -27,7 +27,7 @@ class ScraperTestCase(TestCase):
 
         # Legitimate entries
         artist = TrackContributor.objects.create(title="Oasis")
-        album = Album.objects.create(title="What's the story morning glory?")
+        album = Album.objects.create(title="What's the story morning glory")
         track = Track.objects.create(title="Don't look back in anger")
         track.create_credit("Oasis", "artist")
         track.album.add(album.id)
