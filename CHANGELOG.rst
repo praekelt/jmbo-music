@@ -1,6 +1,12 @@
 Changelog
 =========
 
+next
+----
+#. Update tests.
+#. Django 1.6 compatibility.
+#. Up minimum jmbo to 2.0.0.
+
 0.2.10
 ------
 #. Expand API to include Track Contributor.
