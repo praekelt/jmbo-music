@@ -22,12 +22,12 @@ def _wikipedia(instance):
 
     # Help wikipedia out with the search string
     if isinstance(instance, TrackContributor):
-        search = instance.title + ' artist'
+        search = instance.title + ' artist band'
     elif isinstance(instance, Track):
         # Track pages usually don't exist on Wikipedia so preferably use artist
         contributors = instance.get_primary_contributors()
         if contributors:
-            search = contributors[0].title + ' artist'
+            search = contributors[0].title + ' artist band'
         else:
             # Maybe we get lucky with just the song title
             search = instance.title + ' song'
