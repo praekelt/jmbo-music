@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='jmbo-music',
-    version='2.0.0a1',
+    version='2.0.0',
     description='Jmbo music app.',
     long_description = open('README.rst', 'r').read() + open('AUTHORS.rst', 'r').read() + open('CHANGELOG.rst', 'r').read(),
     author='Praekelt Foundation',
@@ -11,8 +11,8 @@ setup(
     url='http://github.com/praekelt/jmbo-music',
     packages = find_packages(),
     install_requires = [
-        'jmbo==2.0.0a2',
-        'jmbo-gallery==2.0.0a1',
+        'jmbo>=2.0.0',
+        'jmbo-gallery>=2.0.0',
         'lxml',
         'pylast',
     ],
